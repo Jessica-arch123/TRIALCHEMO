@@ -494,8 +494,40 @@
     }
 
     function checkEndGame(winner) {
-        alert(`GAME OVER! ${winner.icon} is the winner with ${winner.pts} PTS!`);
-        location.reload();
+        const sorted = [...players].sort((a, b) => b.pts - a.pts);
+
+        document.getElementById('winnerTitle').innerText = `${winner.icon} ${winner.n} completed 3 rounds!`;
+
+        const list = document.getElementById('leaderboardList');
+        list.innerHTML = '';
+
+        sorted.forEach((p, index) => {
+            const isWinner = p.id === winner.id;
+            const rankRow = document.createElement('div');
+            rankRow.style.cssText = `
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 18px;
+                margin-bottom: 8px;
+                border-radius: 16px;
+                background: ${isWinner ? 'rgba(254, 202, 87, 0.2)' : 'rgba(255, 255, 255, 0.05)'};
+                border: 2px solid ${isWinner ? 'var(--gold)' : 'rgba(255, 255, 255, 0.1)'};
+                font-weight: bold;
+            `;
+
+            rankRow.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.1rem; color: ${isWinner ? 'var(--gold)' : '#fff'};">#${index + 1}</span>
+                    <span style="font-size: 1.5rem;">${p.icon}</span>
+                    <span>${p.n}</span>
+                </div>
+                <div style="color: var(--accent); font-size: 1.1rem;">${p.pts} PTS</div>
+            `;
+            list.appendChild(rankRow);
+        });
+
+        document.getElementById('winnerOverlay').style.display = 'flex';
     }
 </script>
 </body>
