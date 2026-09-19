@@ -181,7 +181,7 @@
         { id:60, mod:"PERIODIC", text:"Increasing atomic radius (Na, Mg, Al):", options:["Al < Mg < Na","Na < Mg < Al","Mg < Al < Na","Al < Na < Mg"], correct:"Al < Mg < Na", explanation:"Radius decreases left-to-right across the period.", price:60, rent:25 }
     ];
         
-    const tileNames = ["GO", "ANALYTICAL", "BONDING", "PERIODIC", "TITRATIONS", "VSEPR", "CONC.", "TITRATIONS", "ACID-BASE", "AUDIT", "ACID-BASE", "TITRATIONS", "LAB BONUS", "ANALYTICAL", "VSEPR", "CONC.", "AUDIT", "CONC.", "BONDING", "ACID-BASE", "BONDING", "VSEPR"];
+    const tileNames = ["GO", "ANALYTICAL", "BONDING", "PERIODIC", "ACID-BASE", "START/END", "CONC.", "TITRATIONS", "VSEPR", "AUDIT", "ACID-BASE", "BONDING", "LAB BONUS", "ANALYTICAL", "START/END", "CONC.", "AUDIT", "CONC.", "BONDING", "PERIODIC", "VSEPR", "START/END"];
     const ownerCols = ["#6c5ce7", "#00d2d3", "#e67e22", "#ff9ff3"];
     let players = [], turn = 0, rolling = false, owners = {}, chars = [{id:0, icon:'🐱', n:'CAT-ALYST', a:false},{id:1, icon:'🐶', n:'DOG-MA', a:false},{id:2, icon:'🦊', n:'FOX-PHATE', a:false},{id:3, icon:'🐰', n:'BUN-SEN', a:false}];
     let usedQsGlobal = [];
@@ -301,6 +301,12 @@
     
     function handleLanding(p){
         if(p.pos === 0) { endTurn(); return; }
+        if(tileNames[p.pos] === "START/END") {
+            p.pts += 50;
+            alert("START/END TILE! +50 PTS 🧪");
+            endTurn();
+            return;
+        }
         if(tileNames[p.pos] === "LAB BONUS") { p.pts += 40; alert("LAB BONUS! +40 PTS"); endTurn(); return; }
         if(tileNames[p.pos] === "AUDIT") { p.pts -= 20; alert("Audit Penalty! -20 PTS"); endTurn(); return; }
         if(owners[p.pos] !== undefined && owners[p.pos] !== turn){
@@ -481,7 +487,8 @@
     }
     
     function updateStatus(){ 
-        document.getElementById('statusLabel').innerText = players[turn].icon + "'S TURN"; 
+        let p = players[turn];
+        document.getElementById('statusLabel').innerText = `${p.icon} ${p.n}'S TURN (ROUND ${p.rounds}/3)`; 
     }
     
     function updatePieces(){
@@ -496,7 +503,6 @@
     }
 
     function checkEndGame() {
-        // Sort players from highest points to lowest points
         const sortedPlayers = [...players].sort((a, b) => b.pts - a.pts);
         const winner = sortedPlayers[0];
 
