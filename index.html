@@ -19,7 +19,7 @@
         .char-card { background: var(--card); padding: 12px; border-radius: 20px; cursor: pointer; border: 3px solid transparent; text-align: center; transition: 0.3s; }
         .char-card.selected { border-color: var(--accent); background: rgba(0, 210, 211, 0.2); transform: scale(1.05); }
         .board-track { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6px; padding: 20px; background: rgba(0,0,0,0.3); height: 500px; position: relative; }
-        .tile { background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; color: #cbd5e1; border: 2px solid transparent; text-align: center; line-height: 1; padding: 2px; position: relative; word-break: break-word; overflow: hidden; }
+        .tile { background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; color: #cbd5e1; border: 2px solid transparent; text-align: center; line-height: 1.1; padding: 2px; position: relative; word-break: break-word; overflow: hidden; }
         .player-piece { position: absolute; font-size: 1.8rem; z-index: 100; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; }
         .center-space { grid-column: 2 / 6; grid-row: 2 / 6; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 30px; margin: 10px; padding: 15px; border: 1px dashed rgba(255,255,255,0.1); }
         .dice-wrap { perspective: 1000px; width: 70px; height: 70px; cursor: pointer; margin-bottom: 5px; }
@@ -181,7 +181,30 @@
         { id:60, mod:"PERIODIC", text:"Increasing atomic radius (Na, Mg, Al):", options:["Al < Mg < Na","Na < Mg < Al","Mg < Al < Na","Al < Na < Mg"], correct:"Al < Mg < Na", explanation:"Radius decreases left-to-right across the period.", price:60, rent:25 }
     ];
         
-     const tileNames = ["GO", "ANALYTICAL", "BONDING", "AUDIT", "TITRATIONS", "VSEPR", "CONC.", "TITRATIONS", "ACID-BASE", "AUDIT", "ANALYTICAL", "TITRATIONS", "LAB BONUS", "ANALYTICAL", "VSEPR", "CONC.", "AUDIT", "CONC.", "BONDING", "ACID-BASE", "BONDING", "GO"];
+    // Exactly 20 slots (#0 to #19) forming a complete perimeter loop around the 6x6 grid
+    const tileNames = [
+        "GO/END",     // #0 (Top-Left corner)
+        "ANALYTICAL", // #1
+        "BONDING",    // #2
+        "PERIODIC",   // #3
+        "ACID-BASE",  // #4
+        "START/END",  // #5 (Top-Right corner)
+        "CONC.",      // #6
+        "ANALYTICAL", // #7
+        "AUDIT",      // #8
+        "LAB BONUS",  // #9 (Bottom-Right corner)
+        "PERIODIC",   // #10
+        "CONC.",      // #11
+        "START/END",  // #12 (Bottom-Left corner)
+        "AUDIT",      // #13
+        "BONDING",    // #14
+        "ACID-BASE",  // #15
+        "ANALYTICAL", // #16
+        "CONC.",      // #17
+        "PERIODIC",   // #18
+        "BONDING"     // #19
+    ];
+
     const ownerCols = ["#6c5ce7", "#00d2d3", "#e67e22", "#ff9ff3"];
     let players = [], turn = 0, rolling = false, owners = {}, chars = [{id:0, icon:'🐱', n:'CAT-ALYST', a:false},{id:1, icon:'🐶', n:'DOG-MA', a:false},{id:2, icon:'🦊', n:'FOX-PHATE', a:false},{id:3, icon:'🐰', n:'BUN-SEN', a:false}];
     let usedQsGlobal = [];
@@ -215,18 +238,19 @@
         const oldTiles = b.querySelectorAll('.tile');
         oldTiles.forEach(t => t.remove());
 
+        // Precisely map exactly 20 tiles sequentially around the 6x6 border grid (indices 0 to 19)
         tileNames.forEach((name, i) => {
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.id = 't' + i;
-            tile.innerHTML = `<div>${name}</div><div style="font-size:0.5rem;opacity:0.5;margin-top:2px;">#${i}</div>`;
+            tile.innerHTML = `<div><b>${name}</b></div><div style="font-size:0.45rem;opacity:0.6;margin-top:2px;">#${i}</div>`;
             
             let row, col;
-            if (i <= 5) { row = 1; col = i + 1; }
-            else if (i <= 10) { row = i - 5; col = 6; }
-            else if (i <= 15) { row = 6; col = 16 - i; }
-            else { row = 22 - i; col = 1; }
-            
+            if (i <= 5) { row = 1; col = i + 1; }                  // Top Row: #0 to #5 (cols 1 to 6)
+            else if (i <= 9) { row = i - 4; col = 6; }             // Right Column: #6 to #9 (rows 2 to 5)
+            else if (i <= 14) { row = 6; col = 15 - i; }           // Bottom Row: #10 to #14 (cols 5 down to 1)
+            else { row = 20 - i; col = 1; }                        // Left Column: #15 to #19 (rows 5 up to 2)
+
             tile.style.gridRow = row;
             tile.style.gridColumn = col;
             b.appendChild(tile);
@@ -281,7 +305,7 @@
     function movePlayer(s){
         let p = players[turn]; 
         let old = p.pos; 
-        p.pos = (p.pos + s) % 22;
+        p.pos = (p.pos + s) % 20; // 20 total track slots
 
         if(p.pos < old) { 
             p.pts += 50; 
