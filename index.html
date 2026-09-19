@@ -19,7 +19,7 @@
         .char-card { background: var(--card); padding: 12px; border-radius: 20px; cursor: pointer; border: 3px solid transparent; text-align: center; transition: 0.3s; }
         .char-card.selected { border-color: var(--accent); background: rgba(0, 210, 211, 0.2); transform: scale(1.05); }
         .board-track { display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr); gap: 6px; padding: 20px; background: rgba(0,0,0,0.3); height: 500px; position: relative; }
-        .tile { background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 700; color: #cbd5e1; border: 2px solid transparent; text-align: center; line-height: 1.1; position: relative; word-break: break-all; }
+        .tile { background: var(--card); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.45rem; font-weight: 700; color: #cbd5e1; border: 2px solid transparent; text-align: center; line-height: 1; padding: 2px; position: relative; word-break: break-word; overflow: hidden; }
         .player-piece { position: absolute; font-size: 1.8rem; z-index: 100; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: none; }
         .center-space { grid-column: 2 / 6; grid-row: 2 / 6; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border-radius: 30px; margin: 10px; padding: 15px; border: 1px dashed rgba(255,255,255,0.1); }
         .dice-wrap { perspective: 1000px; width: 70px; height: 70px; cursor: pointer; margin-bottom: 5px; }
@@ -151,14 +151,14 @@
         { id:30, mod:"ACID-BASE", text:"Strong acid example:", options:["CH<sub>3</sub>COOH","HCl","NH<sub>3</sub>","H<sub>2</sub>CO<sub>3</sub>"], correct:"HCl", explanation:"HCl dissociates completely in water.", price:50, rent:20 },
         { id:31, mod:"ACID-BASE", text:"A buffer consists of a weak acid and its:", options:["Strong base","Conjugate base","Solvent","Indicator"], correct:"Conjugate base", explanation:"Buffers resist pH change using a weak acid and its conjugate base.", price:80, rent:30 },
         { id:32, mod:"ACID-BASE", text:"K<sub>a</sub> measures the strength of:", options:["Strong bases","Weak acids","Solubility","Ionic bonds"], correct:"Weak acids", explanation:"Ka is the equilibrium constant for the dissociation of weak acids.", price:100, rent:40 },
-        { id:33, mod:"ACID-BASE", text:"Shape of NH<sub>3</sub> according to VSEPR?", options:["Trigonal Planar","Trigonal Pyramidal","Tetrahedral","Bent"], correct:"Trigonal Pyramidal", explanation:"One lone pair pushes the three H atoms into a pyramidal shape.", price:60, rent:20 },
-        { id:34, mod:"ACID-BASE", text:"Molecular shape of PCl<sub>5</sub>?", options:["Octahedral","Trigonal Bipyramidal","Tetrahedral","Linear"], correct:"Trigonal Bipyramidal", explanation:"Five electron pairs arrange into a trigonal bipyramid.", price:100, rent:40 },
-        { id:35, mod:"ACID-BASE", text:"Shape of H<sub>2</sub>O according to VSEPR?", options:["Linear","Bent","Tetrahedral","Trigonal Planar"], correct:"Bent", explanation:"Two lone pairs on Oxygen push the H-O-H bonds into a bent shape.", price:60, rent:20 },
-        { id:36, mod:"ACID-BASE", text:"Shape of CH<sub>4</sub>?", options:["Square Planar","Tetrahedral","Octahedral","Pyramidal"], correct:"Tetrahedral", explanation:"Four bonding pairs arrange at 109.5 degrees to minimize repulsion.", price:80, rent:30 },
-        { id:37, mod:"ACID-BASE", text:"Bond angle in linear CO<sub>2</sub>?", options:["90°","109.5°","120°","180°"], correct:"180°", explanation:"The central carbon atom is sp-hybridized, resulting in 180 degrees.", price:60, rent:25 },
-        { id:38, mod:"ACID-BASE", text:"Shape of SF<sub>6</sub>?", options:["Octahedral","Hexagonal","Square Planar","Trigonal Bipyramidal"], correct:"Octahedral", explanation:"Six fluorine atoms are arranged symmetrically around the sulfur atom.", price:100, rent:40 },
-        { id:39, mod:"ACID-BASE", text:"Bond angle in tetrahedral CH<sub>4</sub>?", options:["180°","120°","109.5°","90°"], correct:"109.5°", explanation:"Tetrahedral geometry results in 109.5 degree angles.", price:80, rent:30 },
-        { id:40, mod:"ACID-BASE", text:"Shape of BF<sub>3</sub>?", options:["Trigonal Planar","Trigonal Pyramidal","Bent","Linear"], correct:"Trigonal Planar", explanation:"Three bonding pairs arrange in a flat plane at 120 degrees.", price:80, rent:30 },
+        { id:33, mod:"VSEPR", text:"Shape of NH<sub>3</sub> according to VSEPR?", options:["Trigonal Planar","Trigonal Pyramidal","Tetrahedral","Bent"], correct:"Trigonal Pyramidal", explanation:"One lone pair pushes the three H atoms into a pyramidal shape.", price:60, rent:20 },
+        { id:34, mod:"VSEPR", text:"Molecular shape of PCl<sub>5</sub>?", options:["Octahedral","Trigonal Bipyramidal","Tetrahedral","Linear"], correct:"Trigonal Bipyramidal", explanation:"Five electron pairs arrange into a trigonal bipyramid.", price:100, rent:40 },
+        { id:35, mod:"VSEPR", text:"Shape of H<sub>2</sub>O according to VSEPR?", options:["Linear","Bent","Tetrahedral","Trigonal Planar"], correct:"Bent", explanation:"Two lone pairs on Oxygen push the H-O-H bonds into a bent shape.", price:60, rent:20 },
+        { id:36, mod:"VSEPR", text:"Shape of CH<sub>4</sub>?", options:["Square Planar","Tetrahedral","Octahedral","Pyramidal"], correct:"Tetrahedral", explanation:"Four bonding pairs arrange at 109.5 degrees to minimize repulsion.", price:80, rent:30 },
+        { id:37, mod:"VSEPR", text:"Bond angle in linear CO<sub>2</sub>?", options:["90°","109.5°","120°","180°"], correct:"180°", explanation:"The central carbon atom is sp-hybridized, resulting in 180 degrees.", price:60, rent:25 },
+        { id:38, mod:"VSEPR", text:"Shape of SF<sub>6</sub>?", options:["Octahedral","Hexagonal","Square Planar","Trigonal Bipyramidal"], correct:"Octahedral", explanation:"Six fluorine atoms are arranged symmetrically around the sulfur atom.", price:100, rent:40 },
+        { id:39, mod:"VSEPR", text:"Bond angle in tetrahedral CH<sub>4</sub>?", options:["180°","120°","109.5°","90°"], correct:"109.5°", explanation:"Tetrahedral geometry results in 109.5 degree angles.", price:80, rent:30 },
+        { id:40, mod:"VSEPR", text:"Shape of BF<sub>3</sub>?", options:["Trigonal Planar","Trigonal Pyramidal","Bent","Linear"], correct:"Trigonal Planar", explanation:"Three bonding pairs arrange in a flat plane at 120 degrees.", price:80, rent:30 },
         { id:41, mod:"BONDING", text:"Hybridization of C in Methane (CH<sub>4</sub>)?", options:["sp","sp<sup>2</sup>","sp<sup>3</sup>","dsp<sup>2</sup>"], correct:"sp<sup>3</sup>", explanation:"Four single bonds require four hybrid sp3 orbitals.", price:60, rent:20 },
         { id:42, mod:"BONDING", text:"Hybridization of C in Ethene (C<sub>2</sub>H<sub>4</sub>)?", options:["sp","sp<sup>2</sup>","sp<sup>3</sup>","sp<sup>3</sup>d"], correct:"sp<sup>2</sup>", explanation:"Carbon-carbon double bond requires sp2 hybridization.", price:80, rent:30 },
         { id:43, mod:"BONDING", text:"Bond order for O<sub>2</sub><sup>+</sup> in MO theory?", options:["1.5","2.0","2.5","3.0"], correct:"2.5", explanation:"Removal of an antibonding electron increases bond order to 2.5.", price:100, rent:40 },
@@ -219,12 +219,12 @@
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.id = 't' + i;
-            tile.innerHTML = `<div>${name}</div><div style="font-size:0.6rem;opacity:0.5;">#${i}</div>`;
+            tile.innerHTML = `<div>${name}</div><div style="font-size:0.5rem;opacity:0.5;margin-top:2px;">#${i}</div>`;
             
             let row, col;
             if (i <= 5) { row = 1; col = i + 1; }
-            else if (i <= 10) { row = i - 4; col = 6; }
-            else if (i <= 15) { row = 6; col = 17 - i; }
+            else if (i <= 10) { row = i - 5; col = 6; }
+            else if (i <= 15) { row = 6; col = 16 - i; }
             else { row = 22 - i; col = 1; }
             
             tile.style.gridRow = row;
