@@ -327,9 +327,9 @@
     
     function handleLanding(p){
         if(p.pos === 0) { endTurn(); return; }
-        if(tileNames[p.pos] === "START/END") {
+        if(tileNames[p.pos] === "GO/END") {
             p.pts += 50;
-            alert("START/END TILE! +50 PTS 🧪");
+            alert("GO/END TILE! +50 PTS 🧪");
             endTurn();
             return;
         }
