@@ -70,7 +70,7 @@
                 </div>
                 <div class="instr-item">
                     <div class="instr-num">5</div>
-                    <span><b>Economy:</b> Earn 50 PTS per GO. You need at least 50 PTS to purchase property.</span>
+                    <span><b>Economy:</b> Earn 50 PTS per GO/END. You need at least 50 PTS to purchase property.</span>
                 </div>
             </div>
             <div class="char-selection">
@@ -188,14 +188,14 @@
         "BONDING",    // #2
         "PERIODIC",   // #3
         "ACID-BASE",  // #4
-        "CHEMISTRY",  // #5 (Top-Right corner)
+        "VSEPR",      // #5 (Top-Right corner)
         "CONC.",      // #6
         "ANALYTICAL", // #7
         "AUDIT",      // #8
         "LAB BONUS",  // #9
         "PERIODIC",   // #10 (Bottom-Right corner)
         "CONC.",      // #11
-        "SCIENCE",  // #12 (Bottom-Left corner)
+        "VSEPR",      // #12 (Bottom-Left corner)
         "AUDIT",      // #13
         "BONDING",    // #14
         "ACID-BASE",  // #15
@@ -327,12 +327,6 @@
     
     function handleLanding(p){
         if(p.pos === 0) { endTurn(); return; }
-        if(tileNames[p.pos] === "GO/END") {
-            p.pts += 50;
-            alert("GO/END TILE! +50 PTS 🧪");
-            endTurn();
-            return;
-        }
         if(tileNames[p.pos] === "LAB BONUS") { p.pts += 40; alert("LAB BONUS! +40 PTS"); endTurn(); return; }
         if(tileNames[p.pos] === "AUDIT") { p.pts -= 20; alert("Audit Penalty! -20 PTS"); endTurn(); return; }
         if(owners[p.pos] !== undefined && owners[p.pos] !== turn){
