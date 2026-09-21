@@ -36,7 +36,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); display: flex; align-items: center; justify-content: center; z-index: 2000; padding: 20px; }
         .card { background: #1e293b; padding: 25px; border-radius: 40px; width: 100%; max-width: 500px; border: 3px solid var(--primary); text-align: center; }
         .btn-mcq { background: var(--card); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 15px; margin-bottom: 8px; width: 100%; cursor: pointer; text-align: left; font-size: 0.85rem; }
-        .p-stat { text-align: center; padding: 8px; opacity: 0.4; flex: 1; transition: 0.3s; font-size: 0.75rem; }
+        .p-stat { text-align: center; padding: 6px; opacity: 0.4; flex: 1; transition: 0.3s; font-size: 0.7rem; }
         .p-stat.active-turn { opacity: 1; background: rgba(255,255,255,0.1); border-radius: 15px; border: 2px solid var(--primary); }
         .owner-tag { position: absolute; top: -5px; font-size: 1.2rem; filter: drop-shadow(0 0 3px black); z-index: 10; }
         .round-popup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--gold); color: #000; padding: 20px 40px; border-radius: 50px; font-weight: 900; font-size: 2rem; display: none; z-index: 3000; border: 4px solid white; box-shadow: 0 0 30px var(--gold); }
@@ -54,7 +54,7 @@
          <div class="instr-panel">
             <h3 style="color:var(--gold); margin:0 0 8px 0; font-size:0.9rem;">Game Rules</h3>
             <div class="instr-item"><div class="instr-num">1</div><span><b>Join:</b> Enter your name & pick an avatar to join (1-4 players).</span></div>
-            <div class="instr-item"><div class="instr-num">2</div><span><b>Victory:</b> Complete <b>3 full rounds</b> around the board.</span></div>
+            <div class="instr-item"><div class="instr-num">2</div><span><b>Victory:</b> First to complete <b>3 full rounds</b> wins!</span></div>
             <div class="instr-item"><div class="instr-num">3</div><span><b>Points:</b> Correct (+20) | Wrong (-30) | Audit (-20) | Lab (+40).</span></div>
             <div class="instr-item"><div class="instr-num">4</div><span><b>Sabotage:</b> Spend 50 PTS to target an opponent's turn or points.</span></div>
             
@@ -69,7 +69,6 @@
          <div class="char-selection">
             <h3 style="margin:0 0 8px 0; font-size:0.9rem;">Player Registration</h3>
             
-            <!-- Kahoot-style registration inputs -->
             <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1);">
                 <input type="text" id="playerNameInput" placeholder="Enter Nickname..." style="width: 100%; padding: 10px; border-radius: 12px; border: 1px solid var(--accent); background: rgba(0,0,0,0.4); color: white; font-family:'Outfit'; font-size: 0.85rem; box-sizing: border-box; margin-bottom: 10px;">
                 
@@ -84,7 +83,6 @@
                 <button class="btn" style="background:var(--primary); font-size:0.8rem;" onclick="addPlayer()">JOIN GAME</button>
             </div>
 
-            <!-- List of joined players -->
             <div style="margin-bottom: 10px;">
                 <p style="font-size:0.75rem; margin:0 0 4px 0; color:var(--gold);">Joined Players (<span id="playerCount">0</span>/4):</p>
                 <div id="joinedPlayersContainer" style="min-height: 35px;"></div>
@@ -234,20 +232,9 @@
     function addPlayer() {
         const nameInput = document.getElementById('playerNameInput');
         let name = nameInput.value.trim();
-        if(!name) {
-            alert("Please enter a nickname!");
-            return;
-        }
-        if(players.length >= 4) {
-            alert("Maximum 4 players allowed!");
-            return;
-        }
-
-        // Check if avatar is already taken
-        if(players.some(p => p.icon === selectedAvatar)) {
-            alert("This avatar is already chosen! Pick another one.");
-            return;
-        }
+        if(!name) { alert("Please enter a nickname!"); return; }
+        if(players.length >= 4) { alert("Maximum 4 players allowed!"); return; }
+        if(players.some(p => p.icon === selectedAvatar)) { alert("This avatar is already chosen! Pick another one."); return; }
 
         players.push({ id: players.length, icon: selectedAvatar, n: name, pos: 0, pts: 30, skip: false, rounds: 1 });
         nameInput.value = '';
@@ -285,7 +272,7 @@
             const pc = document.createElement('div'); pc.id = 'piece'+p.id; pc.className = 'player-piece'; pc.innerText = p.icon;
             document.getElementById('piecesContainer').appendChild(pc);
             const st = document.createElement('div'); st.id = 'stat'+i; st.className = 'p-stat'+(i===0?' active-turn':'');
-            st.innerHTML = `<span style="font-size:1rem;">${p.icon}</span><br><small style="font-size:0.6rem;">${p.n}</small><br><b id="pts${i}">${p.pts}</b>`;
+            st.innerHTML = `<span style="font-size:0.9rem;">${p.icon}</span><br><small style="font-size:0.55rem;">${p.n}</small><br><span style="font-size:0.55rem; color:var(--gold);" id="round${i}">Round ${p.rounds}/3</span><br><b id="pts${i}">${p.pts}</b>`;
             d.appendChild(st);
         });
         updateStatus(); updatePieces();
@@ -312,6 +299,7 @@
             p.pts += 50; p.rounds++;
             document.getElementById('roundAlert').style.display='block'; 
             setTimeout(()=>document.getElementById('roundAlert').style.display='none', 1500); 
+            updateStats();
             if(p.rounds > 3) {
                 checkEndGame(p);
                 return;
@@ -322,12 +310,12 @@
 
     function handleLanding(p){
         if(p.pos === 0) { endTurn(); return; }
-        if(tileNames[p.pos] === "LAB BONUS") { p.pts += 40; alert("LAB BONUS! +40 PTS"); endTurn(); return; }
-        if(tileNames[p.pos] === "AUDIT") { p.pts -= 20; alert("Audit Penalty! -20 PTS"); endTurn(); return; }
+        if(tileNames[p.pos] === "LAB BONUS") { p.pts += 40; alert("LAB BONUS! +40 PTS"); updateStats(); endTurn(); return; }
+        if(tileNames[p.pos] === "AUDIT") { p.pts -= 20; alert("Audit Penalty! -20 PTS"); updateStats(); endTurn(); return; }
         if(owners[p.pos] !== undefined && owners[p.pos] !== turn){
             let rent = 25;
             let o = players[owners[p.pos]]; p.pts -= rent; o.pts += rent;
-            alert(`Rent Paid: 25 PTS to ${o.icon} ${o.n}`); endTurn();
+            alert(`Rent Paid: 25 PTS to ${o.icon} ${o.n}`); updateStats(); endTurn();
         } else { showQuestion(p.pos, p); }
     }
 
@@ -464,8 +452,15 @@
         updateStatus();
     }
 
-    function updateStats(){ players.forEach((p,i)=>document.getElementById('pts'+i).innerText = p.pts); }
+    function updateStats(){ 
+        players.forEach((p,i)=>{
+            document.getElementById('pts'+i).innerText = p.pts;
+            document.getElementById('round'+i).innerText = `Round ${p.rounds}/3`;
+        }); 
+    }
+
     function updateStatus(){ document.getElementById('statusLabel').innerText = players[turn].icon + " " + players[turn].n + "'S TURN"; }
+    
     function updatePieces(){
         players.forEach((p, i) => {
             const t = document.getElementById('t'+p.pos); const pc = document.getElementById('piece'+p.id);
@@ -474,11 +469,37 @@
     }
 
     function checkEndGame(winner) {
-        alert(`GAME OVER! ${winner.icon} ${winner.n} wins with ${winner.pts} PTS!`);
+        // Sort players by rounds completed first, then points
+        let sortedPlayers = [...players].sort((a, b) => {
+            if (b.rounds !== a.rounds) return b.rounds - a.rounds;
+            return b.pts - a.pts;
+        });
+
+        // Show detailed ranking modal
+        const area = document.getElementById('optionsArea');
+        document.getElementById('qHeader').innerText = "🏆 MATCH RESULTS 🏆";
+        document.getElementById('qHeader').style.color = "var(--gold)";
+        document.getElementById('qText').innerHTML = `<b>Winner: ${winner.icon} ${winner.n}!</b>`;
         
+        let rankingHTML = '<div style="text-align:left; max-height:220px; overflow-y:auto; margin-bottom:15px;">';
+        sortedPlayers.forEach((p, index) => {
+            let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : '👤'));
+            rankingHTML += `
+                <div style="padding:8px 12px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;">
+                    <span><b>${medal} #${index+1}</b> ${p.icon} ${p.n}</span>
+                    <span><b>${p.pts} PTS</b> <small style="opacity:0.7;">(Rd ${p.rounds})</small></span>
+                </div>`;
+        });
+        rankingHTML += '</div>';
+
+        area.innerHTML = rankingHTML + '<button class="btn" style="background:var(--accent); color:#000;" onclick="submitScoreAndRestart(\'' + winner.icon + ' ' + winner.n + '\', ' + winner.pts + ')">SAVE & RESTART</button>';
+        document.getElementById('qOverlay').style.display = 'flex';
+    }
+
+    function submitScoreAndRestart(winnerName, winnerPts) {
         const scoreData = {
             data: [
-                { Name: `${winner.icon} ${winner.n}`, Points: winner.pts, Date: new Date().toLocaleDateString() }
+                { Name: winnerName, Points: winnerPts, Date: new Date().toLocaleDateString() }
             ]
         };
 
