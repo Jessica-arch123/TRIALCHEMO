@@ -218,8 +218,30 @@
     let players = [], turn = 0, rolling = false, owners = {}, chars = [{id:0, icon:'🐱', n:'CAT-ALYST', a:false},{id:1, icon:'🐶', n:'DOG-MA', a:false},{id:2, icon:'🦊', n:'FOX-PHATE', a:false},{id:3, icon:'🐰', n:'BUN-SEN', a:false}];
     let usedQsGlobal = [];
 
-    function play(type) {
-        console.log("Audio trigger:", type);
+function loadGlobalLeaderboard() {
+        fetch('https://sheetdb.io/api/v1/9v4hyoxdw845s')
+            .then(response => response.json())
+            .then(data => {
+                // Sort scores from highest to lowest
+                data.sort((a, b) => b.Points - a.Points);
+                // Take top 5
+                const topScores = data.slice(0, 5);
+
+                const listEl = document.getElementById('leaderboardList');
+                if (listEl) {
+                    listEl.innerHTML = topScores.length === 0 ? '<li>No scores yet!</li>' : 
+                        topScores.map(s => `<li><b>${s.Name}</b> — ${s.Points} PTS</li>`).join('');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading leaderboard:', error);
+            });
+    }
+
+    // Call this when the window loads
+    window.onload = function() {
+        loadGlobalLeaderboard();
+    };
     }
 function togglePlayer(id){
         chars[id].a = !chars[id].a;
@@ -530,27 +552,33 @@ function togglePlayer(id){
         });
     }
 
-    function checkEndGame() {
-        const sortedPlayers = [...players].sort((a, b) => b.pts - a.pts);
-        const winner = sortedPlayers[0];
+function checkEndGame(winner) {
+        alert(`GAME OVER! ${winner.icon} ${winner.n} wins with ${winner.pts} PTS!`);
 
-        let standingsHTML = `<p style="font-size: 0.9rem; margin-bottom: 15px;"><b>Winner:</b> ${winner.icon} ${winner.n} with <b>${winner.pts} PTS</b>!</p>`;
-        standingsHTML += `<p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 5px;"><b>Final Standings:</b></p>`;
-        standingsHTML += `<div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 15px; max-height: 200px; overflow-y: auto;">`;
+        // Data to send to your Google Sheet via API
+        const scoreData = {
+            data: [
+                { Name: `${winner.icon} ${winner.n}`, Points: winner.pts, Date: new Date().toLocaleDateString() }
+            ]
+        };
 
-        sortedPlayers.forEach((p, index) => {
-            const badge = index === 0 ? "👑" : `#${index + 1}`;
-            standingsHTML += `
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <span>${badge} ${p.icon} <b>${p.n}</b></span>
-                    <span style="color: var(--accent); font-weight: bold;">${p.pts} PTS</span>
-                </div>
-            `;
+        // Send data to your Google Sheet database
+        fetch('https://sheetdb.io/api/v1/9v4hyoxdw845s', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(scoreData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Error saving score:', error);
+            location.reload();
         });
-        standingsHTML += `</div>`;
-
-        document.getElementById('endGameContent').innerHTML = standingsHTML;
-        document.getElementById('endGameModal').style.display = 'flex';
     }
 </script>
 </body>
