@@ -402,28 +402,24 @@
         document.getElementById('qText').innerText = "Select an action to buy:";
         area.innerHTML = '';
 
-        // Option 1: Skip Turn (50 PTS)
         const b1 = document.createElement('button');
         b1.className = 'btn-mcq';
         b1.innerHTML = "<b>Skip Next Turn</b> (Cost: 50 PTS)";
         b1.onclick = () => selectSabotageAction('skip', 50);
         area.appendChild(b1);
 
-        // Option 2: Deduct 20 PTS (50 PTS)
         const b2 = document.createElement('button');
         b2.className = 'btn-mcq';
         b2.innerHTML = "<b>Deduct 20 PTS</b> (Cost: 50 PTS)";
         b2.onclick = () => selectSabotageAction('deduct', 50);
         area.appendChild(b2);
 
-        // Option 3: Backward One Step (100 PTS)
         const b3 = document.createElement('button');
         b3.className = 'btn-mcq';
         b3.innerHTML = "<b>Backward One Step</b> (Cost: 100 PTS)";
         b3.onclick = () => selectSabotageAction('backward', 100);
         area.appendChild(b3);
 
-        // Return to Game Button
         const returnBtn = document.createElement('button');
         returnBtn.className = 'btn';
         returnBtn.style.background = '#4b5563';
@@ -530,7 +526,7 @@
             rankingHTML += `
                 <div style="padding:8px 12px; background:rgba(255,255,255,0.05); border-radius:10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; font-size:0.85rem;">
                     <span><b>${medal} #${index+1}</b> ${p.icon} ${p.n}</span>
-                    <span><b>${p.pts} PTS</b> <small style="opacity:0.7;">(Rd ${p.rounds})</small></span>
+                    <span><b>${p.pts} PTS</b></span>
                 </div>`;
         });
         rankingHTML += '</div>';
