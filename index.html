@@ -73,13 +73,22 @@
                     <span><b>Economy:</b> Earn 50 PTS per GO/END. You need at least 50 PTS to purchase property.</span>
                 </div>
             </div>
-            <div class="char-selection">
-                <h3 style="margin:0 0 10px 0; font-size:1rem;">Characters</h3>
-                <div class="char-grid">
-                    <div id="card0" onclick="togglePlayer(0)" class="char-card"><span>🐱</span><br><small id="n0">CAT-ALYST</small></div>
-                    <div id="card1" onclick="togglePlayer(1)" class="char-card"><span>🐶</span><br><small id="n1">DOG-MA</small></div>
-                    <div id="card2" onclick="togglePlayer(2)" class="char-card"><span>🦊</span><br><small id="n2">FOX-PHATE</small></div>
-                    <div id="card3" onclick="togglePlayer(3)" class="char-card"><span>🐰</span><br><small id="n3">BUN-SEN</small></div>
+            <div class="char-grid">
+    <div id="card0" onclick="togglePlayer(0)" class="char-card">
+        <span>🐱</span><br>
+        <input type="text" id="input0" value="CAT-ALYST" onclick="event.stopPropagation()" oninput="chars[0].n = this.value" style="background:transparent; border:none; color:white; text-align:center; font-family:'Outfit'; font-size:0.7rem; width:90%; margin-top:4px;">
+    </div>
+    <div id="card1" onclick="togglePlayer(1)" class="char-card">
+        <span>🐶</span><br>
+        <input type="text" id="input1" value="DOG-MA" onclick="event.stopPropagation()" oninput="chars[1].n = this.value" style="background:transparent; border:none; color:white; text-align:center; font-family:'Outfit'; font-size:0.7rem; width:90%; margin-top:4px;">
+    </div>
+    <div id="card2" onclick="togglePlayer(2)" class="char-card">
+        <span>🦊</span><br>
+        <input type="text" id="input2" value="FOX-PHATE" onclick="event.stopPropagation()" oninput="chars[2].n = this.value" style="background:transparent; border:none; color:white; text-align:center; font-family:'Outfit'; font-size:0.7rem; width:90%; margin-top:4px;">
+    </div>
+    <div id="card3" onclick="togglePlayer(3)" class="char-card">
+        <span>🐰</span><br>
+        <input type="text" id="input3" value="BUN-SEN" onclick="event.stopPropagation()" oninput="chars[3].n = this.value" style="background:transparent; border:none; color:white; text-align:center; font-family:'Outfit'; font-size:0.7rem; width:90%; margin-top:4px;">
                 </div>
                 <button class="btn" style="background:var(--accent); color:#000;" id="startBtn" disabled onclick="startGame()">START GAME</button>
             </div>
@@ -212,12 +221,11 @@
     function play(type) {
         console.log("Audio trigger:", type);
     }
-
-    function togglePlayer(id){
+function togglePlayer(id){
         chars[id].a = !chars[id].a;
         document.getElementById('card'+id).classList.toggle('selected', chars[id].a);
-        document.getElementById('n'+id).innerText = chars[id].a ? 'SELECTED' : chars[id].n;
         document.getElementById('startBtn').disabled = chars.filter(c=>c.a).length < 1;
+    }
     }
 
     function startGame(){
