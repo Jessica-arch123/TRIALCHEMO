@@ -56,7 +56,7 @@
             <div class="instr-item"><div class="instr-num">1</div><span><b>Join:</b> Enter your name & pick an avatar to join (1-4 players).</span></div>
             <div class="instr-item"><div class="instr-num">2</div><span><b>Victory:</b> First to complete <b>3 full rounds</b> wins!</span></div>
             <div class="instr-item"><div class="instr-num">3</div><span><b>Points:</b> Correct (+20) | Wrong (-30) | Audit (-20) | Lab (+40).</span></div>
-            <div class="instr-item"><div class="instr-num">4</div><span><b>Sabotage:</b> Spend 50 PTS to target an opponent's turn or points.</span></div>
+            <div class="instr-item"><div class="instr-num">4</div><span><b>Sabotage:</b> Spend PTS to buy chances or target opponents.</span></div>
             
             <div class="leaderboard-panel" style="margin-top: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; border: 1px solid var(--gold);">
                 <h3 style="color: var(--gold); margin: 0 0 5px 0; font-size: 0.8rem;">🏆 Global Leaderboard</h3>
@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <button id="rollBtn" class="btn btn-roll-big" onclick="rollDice()">ROLL</button>
-                <button class="btn btn-chance-big" onclick="buySabotage()">BUY CHANCE (50)</button>
+                <button class="btn btn-chance-big" onclick="buySabotage()">BUY CHANCE</button>
             </div>
             <div id="piecesContainer"></div>
         </div>
@@ -202,6 +202,8 @@
     let selectedAvatar = '🐱';
     let turn = 0, rolling = false, owners = {};
     let usedQsGlobal = [];
+    let chosenSabotageAction = null;
+    let chosenSabotageCost = 0;
 
     // Load global leaderboard on startup (Replace URL with your SheetDB API endpoint)
     window.onload = function() {
@@ -393,11 +395,58 @@
 
     function buySabotage() {
         let p = players[turn];
-        if (p.pts < 50) { alert("Need 50 PTS to buy a Chance/Sabotage!"); return; }
+        if (p.pts < 50) { alert("You need at least 50 PTS to buy a Chance/Sabotage action!"); return; }
 
         const area = document.getElementById('optionsArea');
-        document.getElementById('qHeader').innerText = "CHOOSE SABOTAGE";
-        document.getElementById('qText').innerText = "Spend 50 PTS to target an opponent:";
+        document.getElementById('qHeader').innerText = "CHOOSE CHANCE ACTION";
+        document.getElementById('qText').innerText = "Select an action to buy:";
+        area.innerHTML = '';
+
+        // Option 1: Skip Turn (50 PTS)
+        const b1 = document.createElement('button');
+        b1.className = 'btn-mcq';
+        b1.innerHTML = "<b>Skip Next Turn</b> (Cost: 50 PTS)";
+        b1.onclick = () => selectSabotageAction('skip', 50);
+        area.appendChild(b1);
+
+        // Option 2: Deduct 20 PTS (50 PTS)
+        const b2 = document.createElement('button');
+        b2.className = 'btn-mcq';
+        b2.innerHTML = "<b>Deduct 20 PTS</b> (Cost: 50 PTS)";
+        b2.onclick = () => selectSabotageAction('deduct', 50);
+        area.appendChild(b2);
+
+        // Option 3: Backward One Step (100 PTS)
+        const b3 = document.createElement('button');
+        b3.className = 'btn-mcq';
+        b3.innerHTML = "<b>Backward One Step</b> (Cost: 100 PTS)";
+        b3.onclick = () => selectSabotageAction('backward', 100);
+        area.appendChild(b3);
+
+        // Return to Game Button
+        const returnBtn = document.createElement('button');
+        returnBtn.className = 'btn';
+        returnBtn.style.background = '#4b5563';
+        returnBtn.innerText = "Return to Game";
+        returnBtn.onclick = () => {
+            document.getElementById('qOverlay').style.display = 'none';
+        };
+        area.appendChild(returnBtn);
+
+        document.getElementById('qOverlay').style.display = 'flex';
+    }
+
+    function selectSabotageAction(action, cost) {
+        let p = players[turn];
+        if (p.pts < cost) {
+            alert(`You need at least ${cost} PTS for this action!`);
+            return;
+        }
+        chosenSabotageAction = action;
+        chosenSabotageCost = cost;
+
+        const area = document.getElementById('optionsArea');
+        document.getElementById('qText').innerText = `Select target opponent:`;
         area.innerHTML = '';
 
         players.forEach((target, i) => {
@@ -405,40 +454,36 @@
                 const b = document.createElement('button');
                 b.className = 'btn-mcq';
                 b.innerHTML = `Target ${target.icon} ${target.n}`;
-                b.onclick = () => { showSabotageOptions(target, p); };
+                b.onclick = () => executeSabotage(target);
                 area.appendChild(b);
             }
         });
-        document.getElementById('qOverlay').style.display = 'flex';
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'btn';
+        backBtn.style.background = '#4b5563';
+        backBtn.innerText = "Back";
+        backBtn.onclick = buySabotage;
+        area.appendChild(backBtn);
     }
 
-    function showSabotageOptions(target, attacker) {
-        const area = document.getElementById('optionsArea');
-        document.getElementById('qText').innerText = `Targeting ${target.n}. Choose effect:`;
-        area.innerHTML = '';
+    function executeSabotage(target) {
+        let attacker = players[turn];
+        attacker.pts -= chosenSabotageCost;
+        let msg = "";
 
-        const skipBtn = document.createElement('button');
-        skipBtn.className = 'btn-mcq';
-        skipBtn.innerHTML = "Skip their next turn";
-        skipBtn.onclick = () => {
-            attacker.pts -= 50;
+        if (chosenSabotageAction === 'skip') {
             target.skip = true;
-            closeSabotage(`Sabotage! ${target.n} will skip their next turn.`);
-        };
-        area.appendChild(skipBtn);
-
-        const deductBtn = document.createElement('button');
-        deductBtn.className = 'btn-mcq';
-        deductBtn.innerHTML = "Deduct 20 PTS";
-        deductBtn.onclick = () => {
-            attacker.pts -= 50;
+            msg = `Sabotage! ${target.n} will skip their next turn.`;
+        } else if (chosenSabotageAction === 'deduct') {
             target.pts -= 20;
-            closeSabotage(`Sabotage! You deducted 20 PTS from ${target.n}.`);
-        };
-        area.appendChild(deductBtn);
-    }
+            msg = `Sabotage! You deducted 20 PTS from ${target.n}.`;
+        } else if (chosenSabotageAction === 'backward') {
+            target.pos = (target.pos - 1 + 22) % 22;
+            updatePieces();
+            msg = `Sabotage! ${target.n} was pushed backward one step.`;
+        }
 
-    function closeSabotage(msg) {
         document.getElementById('qOverlay').style.display = 'none';
         alert(msg);
         updateStats();
@@ -469,13 +514,11 @@
     }
 
     function checkEndGame(winner) {
-        // Sort players by rounds completed first, then points
         let sortedPlayers = [...players].sort((a, b) => {
             if (b.rounds !== a.rounds) return b.rounds - a.rounds;
             return b.pts - a.pts;
         });
 
-        // Show detailed ranking modal
         const area = document.getElementById('optionsArea');
         document.getElementById('qHeader').innerText = "🏆 MATCH RESULTS 🏆";
         document.getElementById('qHeader').style.color = "var(--gold)";
